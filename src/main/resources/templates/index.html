@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интернет-аптека в Алмате</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/bootstrap.bundle.js}"></script>
+    <link rel="stylesheet" th:href="@{/style/main.css}">
+    <link rel="stylesheet" th:href="@{/style/reset.css}">
+    <link rel="stylesheet" th:href="@{/style/bootstrap.css}">
+    <script>
+        var modal = document.getElementById('id01');
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function openModal(id) {
+            console.log('aa')
+            getSubCategories(id)
+            let modalElement = document.getElementById('temporaryModal');
+            let modalInstance = new bootstrap.Modal(modalElement);
+            modalInstance.show();
+
+            let backdropElement = document.querySelector('.modal-backdrop');
+            if (backdropElement) {
+                backdropElement.remove();
+            }
+
+            modalElement.style.width = '65%';
+            modalElement.style.height = '75%';
+            modalElement.style.marginTop = '10%';
+            modalElement.style.marginLeft = '25%';
+
+            // modalElement.style.backgroundColor = '#cb0000';
+            // modalElement.style.opacity = '0.5'
+            modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'
+
+        }
+
+        function closeModal() {
+
+            let modalInstance = new bootstrap.Modal(document.getElementById('temporaryModal'));
+            modalInstance._hideModal();
+        }
+
+        function getSubCategories(id) {
+            const http = new XMLHttpRequest();
+            http.open("GET", "/api/subcategory/" + id, true);
+            http.setRequestHeader("Content-type", "application/json");
+
+            http.onreadystatechange = function () {
+                if (http.readyState === XMLHttpRequest.DONE && http.status === 200) {
+                    let subCategories = JSON.parse(http.response);
+
+                    let modalBody = document.querySelector('.modal-body');
+                    modalBody.innerHTML = '';
+
+                    let body = '';
+
+                    for (let i = 0; i < subCategories.length; i++) {
+                        let name = subCategories[i].name;
+                        // Correctly concatenate the subcategory id with the string using +
+                        body += "<a onclick=\"openCategories('" +
+                            subCategories[i].id + "')\" class='subcategory-name'>" + name + "</a>";
+                    }
+
+
+
+
+
+                    modalBody.innerHTML = body;
+                }
+            };
+
+            http.send();
+        }
+
+        function openCategories(id) {
+            window.open("/products/get/" + id)
+        }
+
+        (function () {
+            //Login/Signup modal window - by CodyHouse.co
+            function ModalSignin(element) {
+                this.element = element;
+                this.blocks = this.element.getElementsByClassName('js-signin-modal-block');
+                this.switchers = this.element.getElementsByClassName('js-signin-modal-switcher')[0].getElementsByTagName('a');
+                this.triggers = document.getElementsByClassName('js-signin-modal-trigger');
+                this.hidePassword = this.element.getElementsByClassName('js-hide-password');
+                this.init();
+            };
+
+            ModalSignin.prototype.init = function () {
+                var self = this;
+
+                for (var i = 0; i < this.triggers.length; i++) {
+                    (function (i) {
+                        self.triggers[i].addEventListener('click', function (event) {
+                            if (event.target.hasAttribute('data-signin')) {
+                                event.preventDefault();
+                                self.showSigninForm(event.target.getAttribute('data-signin'));
+                            }
+                        });
+                    })(i);
+                }
+
+                //close modal
+                this.element.addEventListener('click', function (event) {
+                    if (hasClass(event.target, 'js-signin-modal') || hasClass(event.target, 'js-close')) {
+                        event.preventDefault();
+                        removeClass(self.element, 'cd-signin-modal--is-visible');
+                    }
+                });
+                //close modal when clicking the esc keyboard button
+                document.addEventListener('keydown', function (event) {
+                    (event.which == '27') && removeClass(self.element, 'cd-signin-modal--is-visible');
+                });
+
+                //hide/show password
+                for (var i = 0; i < this.hidePassword.length; i++) {
+                    (function (i) {
+                        self.hidePassword[i].addEventListener('click', function (event) {
+                            self.togglePassword(self.hidePassword[i]);
+                        });
+                    })(i);
+                }
+
+                //IMPORTANT - REMOVE THIS - it's just to show/hide error messages in the demo
+                this.blocks[0].getElementsByTagName('form')[0].addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    self.toggleError(document.getElementById('signin-email'), true);
+                });
+                this.blocks[1].getElementsByTagName('form')[0].addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    self.toggleError(document.getElementById('signup-username'), true);
+                });
+            };
+
+            ModalSignin.prototype.togglePassword = function (target) {
+                var password = target.previousElementSibling;
+                ('password' == password.getAttribute('type')) ? password.setAttribute('type', 'text') : password.setAttribute('type', 'password');
+                target.textContent = ('Hide' == target.textContent) ? 'Show' : 'Hide';
+                putCursorAtEnd(password);
+            }
+
+            ModalSignin.prototype.showSigninForm = function (type) {
+                // show modal if not visible
+                !hasClass(this.element, 'cd-signin-modal--is-visible') && addClass(this.element, 'cd-signin-modal--is-visible');
+                // show selected form
+                for (var i = 0; i < this.blocks.length; i++) {
+                    this.blocks[i].getAttribute('data-type') == type ? addClass(this.blocks[i], 'cd-signin-modal__block--is-selected') : removeClass(this.blocks[i], 'cd-signin-modal__block--is-selected');
+                }
+                //update switcher appearance
+                var switcherType = (type == 'signup') ? 'signup' : 'login';
+                for (var i = 0; i < this.switchers.length; i++) {
+                    this.switchers[i].getAttribute('data-type') == switcherType ? addClass(this.switchers[i], 'cd-selected') : removeClass(this.switchers[i], 'cd-selected');
+                }
+            };
+
+            ModalSignin.prototype.toggleError = function (input, bool) {
+                // used to show error messages in the form
+                toggleClass(input, 'cd-signin-modal__input--has-error', bool);
+                toggleClass(input.nextElementSibling, 'cd-signin-modal__error--is-visible', bool);
+            }
+
+            var signinModal = document.getElementsByClassName("js-signin-modal")[0];
+            if (signinModal) {
+                new ModalSignin(signinModal);
+            }
+
+            // toggle main navigation on mobile
+            var mainNav = document.getElementsByClassName('js-main-nav')[0];
+            if (mainNav) {
+                mainNav.addEventListener('click', function (event) {
+                    if (hasClass(event.target, 'js-main-nav')) {
+                        var navList = mainNav.getElementsByTagName('ul')[0];
+                        toggleClass(navList, 'cd-main-nav__list--is-visible', !hasClass(navList, 'cd-main-nav__list--is-visible'));
+                    }
+                });
+            }
+
+            //class manipulations - needed if classList is not supported
+            function hasClass(el, className) {
+                if (el.classList) return el.classList.contains(className);
+                else return !!el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+            }
+
+            function addClass(el, className) {
+                var classList = className.split(' ');
+                if (el.classList) el.classList.add(classList[0]);
+                else if (!hasClass(el, classList[0])) el.className += " " + classList[0];
+                if (classList.length > 1) addClass(el, classList.slice(1).join(' '));
+            }
+
+            function removeClass(el, className) {
+                var classList = className.split(' ');
+                if (el.classList) el.classList.remove(classList[0]);
+                else if (hasClass(el, classList[0])) {
+                    var reg = new RegExp('(\\s|^)' + classList[0] + '(\\s|$)');
+                    el.className = el.className.replace(reg, ' ');
+                }
+                if (classList.length > 1) removeClass(el, classList.slice(1).join(' '));
+            }
+
+            function toggleClass(el, className, bool) {
+                if (bool) addClass(el, className);
+                else removeClass(el, className);
+            }
+
+            //credits http://css-tricks.com/snippets/jquery/move-cursor-to-end-of-textarea-or-input/
+            function putCursorAtEnd(el) {
+                if (el.setSelectionRange) {
+                    var len = el.value.length * 2;
+                    el.focus();
+                    el.setSelectionRange(len, len);
+                } else {
+                    el.value = el.value;
+                }
+            };
+        })();
+
+
+        function sendSms() {
+            let smsSubmit = document.querySelector(".login__submit__form")
+            let smsSend = document.querySelector(".login__form")
+            console.log(smsSubmit)
+            console.log(smsSend)
+            smsSend.style.display = 'none'
+            smsSubmit.style.display = 'block'
+            let email = document.getElementById("emailInput").value;
+            const url = `http://localhost:8080/api/emails`
+            // let xhr = new XMLHttpRequest();
+            // xhr.open("POST", url);
+            // xhr.send();
+            // xhr.onload = () => console.log(xhr.responseText);
+
+
+            fetch('http://localhost:8080/api/emails', {
+                method: 'POST',
+                headers: {
+                    'Accept': '*/*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: `${email}`,
+                    smsRequestType: 'REGISTER',
+                })
+            })
+                .then(response => {
+                    if (!response.ok || true) {
+                        throw new Error('Failed to submit SMS code');
+                    }
+                    // Handle success response here
+                    console.log('SMS code submitted successfully');
+                })
+                .catch(error => {
+                    // Handle error here
+                    console.error('Error:', error);
+                });
+
+        }
+
+        function submit() {
+            let code = document.querySelector("#sms_code").value;
+            let email = document.getElementById("emailInput").value;
+            console.log(email);
+            console.log(code);
+
+            fetch('http://localhost:8080/api/emails/verify', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    verificationCode: code,
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // Parse the JSON data
+                })
+                .then(data => {
+                    console.log('Response:', data);
+                    let token = JSON.stringify(data)
+                    console.log('================')
+                    console.log(data.refreshToken)
+                    console.log(data.accessToken)
+                    document.cookie = "refreshToken="+data.refreshToken
+                    console.log('================')
+                    sessionStorage.setItem("refresh-token", data.refreshToken)
+                    sessionStorage.setItem("access-token", data.accessToken)
+                    location.reload()
+                })
+                .catch(error => {
+                    // console.error('Error:', error);
+                    // alert('An error occurred while processing your request. Please try again later.');
+                });
+
+        }
+
+
+        function openModal(id) {
+            console.log('aa')
+            getSubCategories(id)
+            let modalElement = document.getElementById('temporaryModal');
+            let modalInstance = new bootstrap.Modal(modalElement);
+            modalInstance.show();
+
+            let backdropElement = document.querySelector('.modal-backdrop');
+            if (backdropElement) {
+                backdropElement.remove();
+            }
+
+            modalElement.style.width = '65%';
+            modalElement.style.height = '75%';
+            modalElement.style.marginTop = '10%';
+            modalElement.style.marginLeft = '25%';
+
+            // modalElement.style.backgroundColor = '#cb0000';
+            // modalElement.style.opacity = '0.5'
+            modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'
+
+        }
+
+        function closeModal() {
+
+            let modalInstance = new bootstrap.Modal(document.getElementById('temporaryModal'));
+            modalInstance._hideModal();
+        }
+
+        function getSubCategories(id) {
+            const http = new XMLHttpRequest();
+            http.open("GET", "/api/subcategory/" + id, true);
+            http.setRequestHeader("Content-type", "application/json");
+
+            http.onreadystatechange = function () {
+                if (http.readyState === XMLHttpRequest.DONE && http.status === 200) {
+                    let subCategories = JSON.parse(http.response);
+
+                    let modalBody = document.querySelector('.modal-body');
+                    modalBody.innerHTML = '';
+
+                    let body = '';
+
+                    for (let i = 0; i < subCategories.length; i++) {
+                        let name = subCategories[i].name;
+                        // Correctly concatenate the subcategory id with the string using +
+                        body += "<a onclick=\"openCategories('" +
+                            subCategories[i].id + "')\" class='subcategory-name'>" + name + "</a>";
+                    }
+
+
+
+
+
+                    modalBody.innerHTML = body;
+                }
+            };
+
+
+
+
+
+            http.send();
+        }
+    </script>
+    <style>
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            /*border: 1px solid #ccc;*/
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+
+        /** {*/
+        /*    text-align: center;*/
+        /*}*/
+
+        /*assign full width inputs*/
+        input[type=text],
+        input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        /*set a style for the buttons*/
+        button {
+            /*background-color: #4CAF50;*/
+            color: #000;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* set a hover effect for the button*/
+        button:hover {
+            opacity: 0.8;
+        }
+
+
+
+        /*set extra style for the cancel button*/
+        .cancelbtn {
+            width: auto;
+            padding: 10px 18px;
+            background-color: #f44336;
+        }
+
+        /*centre the display image inside the container*/
+        .imgcontainer {
+            text-align: center;
+            margin: 24px 0 12px 0;
+            position: relative;
+        }
+
+
+        /* CSS to customize the modal backdrop */
+
+        /*set image properties*/
+        img.avatar {
+            width: 40%;
+            border-radius: 50%;
+        }
+
+        /*set padding to the container*/
+        .container {
+            padding: 16px;
+        }
+
+        /*set the forgot password text*/
+        span.psw {
+            float: right;
+            padding-top: 16px;
+        }
+
+        /*set the Modal background*/
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        /*style the model content box*/
+        .modal-content {
+            /*background-color: #fefefe;*/
+            margin: 5% auto 15% auto;
+            border: 1px solid #888;
+            width: 40%;
+        }
+
+        /*style the close button*/
+        .close {
+            position: absolute;
+            right: 25px;
+            top: 0;
+            color: #000;
+            font-size: 35px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: red;
+            cursor: pointer;
+        }
+
+        /* add zoom animation*/
+        .animate {
+            -webkit-animation: animatezoom 0.6s;
+            animation: animatezoom 0.6s
+        }
+
+        @-webkit-keyframes animatezoom {
+            from {
+                -webkit-transform: scale(0)
+            }
+
+            to {
+                -webkit-transform: scale(1)
+            }
+        }
+
+        @keyframes animatezoom {
+            from {
+                transform: scale(0)
+            }
+
+            to {
+                transform: scale(1)
+            }
+        }
+
+        @media screen and (max-width: 300px) {
+            span.psw {
+                display: block;
+                float: none;
+            }
+
+            .cancelbtn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="container">
+        <div class="header__wrapper">
+            <nav class="header__nav">
+                <ul class="nav__list">
+                    <li class="nav__list__item">
+                        <a th:href="@{/}">
+                            <img style = "width: 80px; border-radius: 50px; " th:src="@{/image/icon/zxc.svg}" alt="logo">
+                        </a>
+                    </li>
+                    <li class="nav__list__item">
+                        <a th:href="@{/info/payment}">Оплата</a>
+                    </li>
+                    <li class="nav__list__item">
+                        <a th:href="@{/info/delivery}">Доставка</a>
+                    </li>
+
+                    <li class="nav__list__item">
+                        <a th:href="@{/info/contacts}">Контакты</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="dropdown">
+                <button class="catalog">Связаться с фармацевтом </button>
+                <div class="dropdown-content">
+                    <div class="contacts">
+                        <h4></h4>
+                        <ul class="contacts__list">
+                            <li class="contacts__item">
+                                <p>Ауезова 175</p>
+                                <input type="tel" value="+7 7078190409">
+                            </li>
+
+                            <li class="contacts__item">
+                                <p>Телжан Шонанулы 54а</p>
+                                <input type="tel" value="+7 7058472797">
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+</header>
+
+<section class="main">
+    <div class="container">
+        <ul class="main__list">
+            <li class="main__list__item">
+                <div class="dropdown">
+                    <button class="catalog">Каталог товаров</button>
+                    <div class="dropdown-content" style="background-color: #fff">
+                        <!-- Ensure openModal is defined before being referenced -->
+                        <a th:each="category : ${categories}" class="dropdown-cover" href="#" id="content"
+                           th:id="'category_' + ${category.id}" th:text="${category.getName()}"
+                           th:attr="data-category-id=${category.id}"
+                           onmouseenter="openModal(this.getAttribute('data-category-id'))" />
+                    </div>
+                </div>
+            </li>
+
+            <div style="z-index: 10;"  class="modal" id="temporaryModal" tabindex="-1" data-bs-backdrop="static" aria-hidden="true" onmouseleave="closeModal()">
+                <div  class="modal-dialog">
+                    <div  class="modal-content"> <!-- Change modal-lg to adjust size -->
+                        <div  class="modal-header">
+                            <h5 class="modal-title"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="modalBody">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <li class="main__list__item">
+                <a href="/handbook">Справочник лекарств</a>
+            </li>
+            <li class="main__list__item">
+                <input onkeyup="onEnter(this)" placeholder="Название товара"  type="text" class="search__input">
+            </li>
+            <li class="main__list__item">
+                <!--/*@thymesVar id="user" type="kz.aptekaplus.model.User"*/-->
+                <div class="oneLine">
+                    <img th:src="@{/image/icon/authIcon.svg}" alt="">
+                    <a th:href="@{/personal}" th:if="${user}">Личный кабинет</a>
+                    <button th:unless="${user}" onclick=
+                            "document.getElementById('id01').style.display='block'" style="width:auto;">
+                        Login
+                    </button>
+
+                </div>
+
+                <div id="id01" class="modal">
+
+                    <div class="modal-content animate"
+                    >
+
+                        <div class="imgcontainer">
+                <span onclick="document.getElementById('id01').style.display='none'"
+                      class="close"
+                      title="Close Modal">×</span>
+                            <!--                                <img src=-->
+                            <!--                                             "https://media.geeksforgeeks.org/wp-content/cdn-uploads/20190710102234/download3.png"-->
+                            <!--                                     alt="Avatar" class="avatar">-->
+                        </div>
+
+                        <div class="container">
+                            <div class="login__form">
+                                <label><b>Email</b></label>
+                                <input id="emailInput" type="email" placeholder="Напишите почту"
+                                       name="email" required>
+                                <button onclick="sendSms()" type="submit">Login</button>
+                                <p>Мы вышлем проверочный код на этот email</p>
+                            </div>
+                            <div class="login__submit__form">
+                                <h4>Введите код</h4>
+                                <p>Мы выслали сообщение с проверочным кодом на ваш email</p>
+                                <h4>Код из СМС</h4>
+                                <input type="text" id="sms_code" name="sms_code" maxlength="4" pattern="\d{4}"
+                                       title="Please enter a 4-digit code." required>
+
+                                <button onclick="submit()" type="submit">Войти</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="main__list__item">
+                <div class="oneLine">
+                    <img th:src="@{/image/icon/heard.svg}" alt="">
+                    <a th:href="@{/personal/favourites}">Избранное</a>
+                </div>
+            </li>
+            <li class="main__list__item">
+                <div class="oneLine">
+                    <img th:src="@{/image/icon/Vector.svg}" alt="aaa">
+                    <span th:if="${user}" th:text="${user.getBasket().size()}"></span>
+                    <a th:href="@{/basket}">Корзина</a>
+                </div>
+            </li>
+    </ul>
+    </div>
+    </div>
+
+</section>
+
+
+<section class="services">
+    <div class="container">
+        <h1 class="label">Популярные товары</h1>
+        <div class="card-list">
+            <a href="#" class="card-item">
+                <img th:src="@{/image/долгит.jpeg}" alt="Card Image">
+                <span class="developer">Долгит крем 100г</span>
+                <p>
+                    Крем однородной,мягкой консистенции беловато-кремового цвета,
+                    с запахом лавандового и неролового масел.
+                </p>
+
+            </a>
+            <a href="#" class="card-item">
+                <img th:src="@{/image/голапроп.jpeg}" alt="Card Image">
+                <span class="designer">Голапроп спрей для горла 50 мл</span>
+                <p>
+                    Голапроп® спрей для горла применяется для снятия раздражения горла, связанного с кашлем, болью,
+                    ощущением жжения и чувствительностью при глотании.
+
+                </p>
+
+            </a>
+            <a href="#" class="card-item">
+                <img th:src="@{/image/канефрон.jpeg}" alt="Card Image">
+                <span class="designer">Канефрон форте таблетки №30</span>
+                <p>
+                    Канефрон® форте лекарственный препарат растительного происхождения применяется
+                    в комплексной терапии при воспалительных заболеваниях мочевыводящих
+                    путей и с целью предотвращения образования почечных камней.
+                </p>
+
+            </a>
+            <a href="#" class="card-item">
+                <img th:src="@{/image/лостерен.jpeg}" alt="Card Image">
+                <span class="editor">Лостерин крем для ног 75 мл</span>
+                <p>
+                    рем для ног «Лостерин» специально предназначен для ежедневного ухода за сухой,
+                    огрубевшей кожей стоп, склонной к ороговению и образованию сухих мозолей,
+                    натоптышей, в особенности у пациентов, страдающих хроническими кожными заболеваниями
+                </p>
+
+            </a>
+        </div>
+    </div>
+</section>
+
+
+<footer class="footer">
+    <div class="container">
+        <ul class="footer__list">
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Клиентам</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Акции
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Услуги
+                    </li>
+
+                    <li class="footer__list__item__list__item">
+                        Личный кабинет
+                    </li>
+                </ul>
+            </li>
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Информация</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Статьи
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Как купить
+                    </li>
+
+                    <li class="footer__list__item__list__item">
+                        О бонусах
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Самовывоз
+                    </li>
+                </ul>
+            </li>
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Компания</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        О нас
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Контакты
+                    </li>
+
+
+                </ul>
+            </li>
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Мы в соцсетях</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        <a href=""><img style="width: 20px" th:src="@{/image/icon/instagram.svg}" alt="insta"></a>
+                        <a href=""><img style="width: 20px" th:src="@{/image/icon/vk.svg}" alt="vk"></a>
+                        <a href=""><img style="width: 20px" th:src="@{/image/icon/facebook.svg}" alt="facebook"></a>
+                        <a href=""><img style="width: 20px; max-height: 20px;" th:src="@{/image/icon/youtube.svg}" alt="youtube"></a>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Филиалы</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        <div class="filial">
+                            <div class="filial__left">
+                                <p>ул. Ауэзова 175</p>
+                                <span>9:00-21:00</span>
+                            </div>
+                            <div class="filial__right">
+                                <h1>+7 7078190409</h1>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        <div class="filial">
+                            <div class="filial__left">
+                                <p>ул.Телжан Шонанулы 54</p>
+                                <span>9:00-21:00</span>
+                            </div>
+                            <div class="filial__right">
+                                <h1>+7 7058472797</h1>
+                            </div>
+                        </div>
+                    </li>
+
+                </ul>
+            </li>
+
+        </ul>
+    </div>
+</footer>
+
+</body>
+</html>

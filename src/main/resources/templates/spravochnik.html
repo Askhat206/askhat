@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интернет-аптека в Алмате</title>
+<!--    <link rel="stylesheet" th:href="@{/style/normolize.css}">-->
+<!--    <link rel="stylesheet" th:href="@{/style/main.css}">-->
+<!--    <link rel="stylesheet" th:href="@{/style/reset.css}">-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/bootstrap.bundle.js}"></script>
+    <link rel="stylesheet" th:href="@{/style/bootstrap.css}">
+
+    <link rel="stylesheet" th:href="@{/style/main.css}">
+    <link rel="stylesheet" th:href="@{/style/reset.css}">
+    <script>
+        function openModal(id) {
+            console.log('aa')
+            getSubCategories(id)
+            let modalElement = document.getElementById('temporaryModal');
+            let modalInstance = new bootstrap.Modal(modalElement);
+            modalInstance.show();
+
+            let backdropElement = document.querySelector('.modal-backdrop');
+            if (backdropElement) {
+                backdropElement.remove();
+            }
+
+            modalElement.style.width = '65%';
+            modalElement.style.height = '75%';
+            modalElement.style.marginTop = '10%';
+            modalElement.style.marginLeft = '25%';
+
+            // modalElement.style.backgroundColor = '#cb0000';
+            // modalElement.style.opacity = '0.5'
+            modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'
+
+        }
+
+        function closeModal() {
+
+            let modalInstance = new bootstrap.Modal(document.getElementById('temporaryModal'));
+            modalInstance._hideModal();
+        }
+
+        function getSubCategories(id) {
+            const http = new XMLHttpRequest();
+            http.open("GET", "/api/subcategory/" + id, true);
+            http.setRequestHeader("Content-type", "application/json");
+
+            http.onreadystatechange = function () {
+                if (http.readyState === XMLHttpRequest.DONE && http.status === 200) {
+                    let subCategories = JSON.parse(http.response);
+
+                    let modalBody = document.querySelector('.modal-body');
+                    modalBody.innerHTML = '';
+
+                    let body = '';
+
+                    for (let i = 0; i < subCategories.length; i++) {
+                        let name = subCategories[i].name;
+                        // Correctly concatenate the subcategory id with the string using +
+                        body += "<a onclick=\"openCategories('" +
+                            subCategories[i].id + "')\" class='subcategory-name'>" + name + "</a>";
+                    }
+
+
+
+
+
+                    modalBody.innerHTML = body;
+                }
+            };
+
+            http.send();
+        }
+
+        function openCategories(id) {
+            window.open("/products/get/" + id)
+
+        }
+
+
+    </script>
+    <style>
+        .menu {
+            position: relative;
+            cursor: pointer;
+        }
+
+        body {
+            background-color: #ccc;
+        }
+
+        .options {
+            display: none;
+            position: absolute;
+            top: 0;
+            right: -100px; /* Initially hiding options off-screen */
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu:hover .options {
+            display: block; /* Show options on hover */
+        }
+
+        .main {
+            background-color: #fff;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            margin-top: 94px;
+        }
+
+        /** {*/
+        /*    text-align: center;*/
+        /*}*/
+
+        /*assign full width inputs*/
+        input[type=text],
+        input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        /*set a style for the buttons*/
+        button {
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* set a hover effect for the button*/
+        button:hover {
+            opacity: 0.8;
+        }
+
+        /*set extra style for the cancel button*/
+        .cancelbtn {
+            width: auto;
+            padding: 10px 18px;
+            background-color: #f44336;
+        }
+
+        /*centre the display image inside the container*/
+        .imgcontainer {
+            text-align: center;
+            margin: 24px 0 12px 0;
+            position: relative;
+        }
+
+        /*set image properties*/
+        img.avatar {
+            width: 40%;
+            border-radius: 50%;
+        }
+
+        /*set padding to the container*/
+        .container {
+            padding: 16px;
+        }
+
+        /*set the forgot password text*/
+        span.psw {
+            float: right;
+            padding-top: 16px;
+        }
+
+        /*set the Modal background*/
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        /*style the model content box*/
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto 15% auto;
+            border: 1px solid #888;
+            width: 40%;
+        }
+
+        /*style the close button*/
+        .close {
+            position: absolute;
+            right: 25px;
+            top: 0;
+            color: #000;
+            font-size: 35px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: red;
+            cursor: pointer;
+        }
+
+        /* add zoom animation*/
+        .animate {
+            -webkit-animation: animatezoom 0.6s;
+            animation: animatezoom 0.6s
+        }
+
+        @-webkit-keyframes animatezoom {
+            from {
+                -webkit-transform: scale(0)
+            }
+
+            to {
+                -webkit-transform: scale(1)
+            }
+        }
+
+        @keyframes animatezoom {
+            from {
+                transform: scale(0)
+            }
+
+            to {
+                transform: scale(1)
+            }
+        }
+
+        @media screen and (max-width: 300px) {
+            span.psw {
+                display: block;
+                float: none;
+            }
+
+            .cancelbtn {
+                width: 100%;
+            }
+        }
+
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+
+</head>
+<body>
+<header class="header">
+    <div class="container">
+        <div class="header__wrapper">
+            <nav class="header__nav">
+                <ul class="nav__list">
+                    <li class="nav__list__item">
+                        <a th:href="@{/}">
+                            <img style = "width: 80px; border-radius: 50px; " th:src="@{/image/icon/zxc.svg}" alt="logo">
+                        </a>
+                    </li>
+                    <li class="nav__list__item">
+                        <a th:href="@{/info/payment}">Оплата</a>
+                    </li>
+                    <li class="nav__list__item">
+                        <a th:href="@{/info/delivery}">Доставка</a>
+                    </li>
+
+                    <li class="nav__list__item">
+                        <a th:href="@{/info/contacts}">Контакты</a>
+                    </li>
+                </ul>
+            </nav>
+            <p class="contacts">8 777 777 77 77</p>
+        </div>
+    </div>
+
+</header>
+
+<section class="main">
+    <div class="container">
+        <ul class="main__list">
+            <li class="main__list__item">
+                <div class="dropdown">
+                    <button class="catalog">Каталог товаров</button>
+                    <div class="dropdown-content" style="background-color: #fff">
+                        <!-- Ensure openModal is defined before being referenced -->
+                        <a th:each="category : ${categories}" class="dropdown-cover" href="#" id="content"
+                           th:id="'category_' + ${category.id}" th:text="${category.getName()}"
+                           th:attr="data-category-id=${category.id}"
+                           onmouseenter="openModal(this.getAttribute('data-category-id'))" />
+                    </div>
+                </div>
+            </li>
+
+            <div class="modal" id="temporaryModal" tabindex="-1" data-bs-backdrop="static" aria-hidden="true" onmouseleave="closeModal()">
+                <div class="modal-dialog">
+                    <div class="modal-content"> <!-- Change modal-lg to adjust size -->
+                        <div class="modal-header">
+                            <h5 class="modal-title"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="modalBody">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <li class="main__list__item"> <a href="/handbook">Справочник лекарств </a></li>
+            <li class="main__list__item">
+                <input onkeyup="onEnter(this)" placeholder="Название товара"  type="text" class="search__input">
+            </li>
+            <li class="main__list__item">
+                <div class="oneLine">
+                    <img th:src="@{/image/icon/authIcon.svg}" alt="">
+                    <p th:if="${user}"><a href="/personal">Личный кабинет </a></p>
+                    <button th:unless="${user}" onclick=
+                            "document.getElementById('id01').style.display='block'" style="width:auto;">
+                        Login
+                    </button>
+
+                </div>
+
+                <div id="id01" class="modal">
+
+                    <div class="modal-content animate"
+                    >
+
+                        <div class="imgcontainer">
+                <span onclick="document.getElementById('id01').style.display='none'"
+                      class="close"
+                      title="Close Modal">×</span>
+                            <!--                                <img src=-->
+                            <!--                                             "https://media.geeksforgeeks.org/wp-content/cdn-uploads/20190710102234/download3.png"-->
+                            <!--                                     alt="Avatar" class="avatar">-->
+                        </div>
+
+                        <div class="container">
+                            <label><b>Email</b></label>
+                            <input id="emailInput" type="email" placeholder="Напишите почту"
+                                   name="email" required>
+                            <button onclick="sendSms()" type="submit">Login</button>
+                            <p>Мы вышлем проверочный код на этот email</p>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="main__list__item"> <a href="/personal/favourites">Избранное</a></li>
+            <li class="main__list__item"><a href="/basket">Корзина </a></li>
+
+        </ul>
+    </div>
+
+</section>
+
+
+<section class="content">
+    <div class="container">
+        <h3>Справочник лекарств</h3>
+        <ul class="spravochnik__list">
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/А}">А</a></li> <!-- А -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Б}">Б</a></li> <!-- Б -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/В}">В</a></li> <!-- В -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Г}">Г</a></li> <!-- Г -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Д}">Д</a></li> <!-- Д -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Е}">Е</a></li> <!-- Е -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Ж}">Ж</a></li> <!-- Ж -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/З}">З</a></li> <!-- З -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/И}">И</a></li> <!-- И -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Й}">Й</a></li> <!-- Й -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/К}">К</a></li> <!-- К -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Л}">Л</a></li> <!-- Л -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/М}">М</a></li> <!-- М -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Н}">Н</a></li> <!-- Н -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/О}">О</a></li> <!-- О -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/П}">П</a></li> <!-- П -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Р}">Р</a></li> <!-- Р -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/С}">С</a></li> <!-- С -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Т}">Т</a></li> <!-- Т -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/У}">У</a></li> <!-- У -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Ф}">Ф</a></li> <!-- Ф -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Ч}">Х</a></li> <!-- Х -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Ц}">Ц</a></li> <!-- Ц -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Ч}">Ч</a></li> <!-- Ч -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Ш}">Ш</a></li> <!-- Ш -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Щ}">Щ</a></li> <!-- Щ -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Ъ}">Ъ</a></li> <!-- Ъ -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Ы}">Ы</a></li> <!-- Ы -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Ь}">Ь</a></li> <!-- Ь -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Э}">Э</a></li> <!-- Э -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Ю}">Ю</a></li> <!-- Ю -->
+            <li class="spravochnik__item"><a th:href="@{/handbook/starts-with/Я}">Я</a></li> <!-- Я -->
+        </ul>
+    </div>
+</section>
+
+
+<section class="handbook__result">
+    <div class="container">
+        <ul class="handbook__list">
+            <li class="handbook__item" th:each="product : ${products}">
+                <a th:href="@{/products/{productId}(productId=${product.getId()})}" th:text="${product.getName()}"/>
+            </li>
+        </ul>
+        <p th:unless="${isEmpty == false}">Пусто</p>
+    </div>
+</section>
+
+
+
+<footer class="footer">
+    <div class="container">
+        <ul class="footer__list">
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Клиентам</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Акции
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Услуги
+                    </li>
+
+                    <li class="footer__list__item__list__item">
+                        Личный кабинет
+                    </li>
+                </ul>
+            </li>
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Информация</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Статьи
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Как купить
+                    </li>
+
+                    <li class="footer__list__item__list__item">
+                        О бонусах
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Самовывоз
+                    </li>
+                </ul>
+            </li>
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Компания</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        О нас
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Контакты
+                    </li>
+
+
+                </ul>
+            </li>
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Мы в соцсетях</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        <a href=""><img style="width: 20px" th:src="@{/image/icon/instagram.svg}" alt="insta"></a>
+                        <a href=""><img style="width: 20px" th:src="@{/image/icon/vk.svg}" alt="vk"></a>
+                        <a href=""><img style="width: 20px" th:src="@{/image/icon/facebook.svg}" alt="facebook"></a>
+                        <a href=""><img style="width: 20px; max-height: 20px;" th:src="@{/image/icon/youtube.svg}" alt="youtube"></a>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Филиалы</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        <div class="filial">
+                            <div class="filial__left">
+                                <p>ул. Ауэзова 175</p>
+                                <span>9:00-21:00</span>
+                            </div>
+                            <div class="filial__right">
+                                <h1>+7 7078190409</h1>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        <div class="filial">
+                            <div class="filial__left">
+                                <p>ул.Телжан Шонанулы 54а</p>
+                                <span>9:00-21:00</span>
+                            </div>
+                            <div class="filial__right">
+                                <h1>+7 7058472797</h1>
+                            </div>
+                        </div>
+                    </li>
+
+                </ul>
+            </li>
+
+        </ul>
+    </div>
+</footer>
+</body>
+</html>

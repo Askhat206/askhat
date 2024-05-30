@@ -1,0 +1,32 @@
+{
+  "groups": [
+    {
+      "name": "minio",
+      "type": "kz.aptekaplus.config.MinioProperties",
+      "sourceType": "kz.aptekaplus.config.MinioProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "minio.access-key",
+      "type": "java.lang.String",
+      "sourceType": "kz.aptekaplus.config.MinioProperties"
+    },
+    {
+      "name": "minio.bucket-name",
+      "type": "java.lang.String",
+      "sourceType": "kz.aptekaplus.config.MinioProperties"
+    },
+    {
+      "name": "minio.endpoint",
+      "type": "java.lang.String",
+      "sourceType": "kz.aptekaplus.config.MinioProperties"
+    },
+    {
+      "name": "minio.secret-key",
+      "type": "java.lang.String",
+      "sourceType": "kz.aptekaplus.config.MinioProperties"
+    }
+  ],
+  "hints": []
+}

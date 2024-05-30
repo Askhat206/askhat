@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интернет-аптека в Алмате</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/bootstrap.bundle.js}"></script>
+    <link rel="stylesheet" th:href="@{/style/main.css}">
+    <link rel="stylesheet" th:href="@{/style/reset.css}">
+    <link rel="stylesheet" th:href="@{/style/bootstrap.css}">
+    <script>
+        var modal = document.getElementById('id01');
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function openModal(id) {
+            console.log('aa')
+            getSubCategories(id)
+            let modalElement = document.getElementById('temporaryModal');
+            let modalInstance = new bootstrap.Modal(modalElement);
+            modalInstance.show();
+
+            let backdropElement = document.querySelector('.modal-backdrop');
+            if (backdropElement) {
+                backdropElement.remove();
+            }
+
+            modalElement.style.width = '65%';
+            modalElement.style.height = '75%';
+            modalElement.style.marginTop = '10%';
+            modalElement.style.marginLeft = '25%';
+
+            // modalElement.style.backgroundColor = '#cb0000';
+            // modalElement.style.opacity = '0.5'
+            modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'
+
+        }
+
+        function closeModal() {
+
+            let modalInstance = new bootstrap.Modal(document.getElementById('temporaryModal'));
+            modalInstance._hideModal();
+        }
+
+        function getSubCategories(id) {
+            const http = new XMLHttpRequest();
+            http.open("GET", "/api/subcategory/" + id, true);
+            http.setRequestHeader("Content-type", "application/json");
+
+            http.onreadystatechange = function () {
+                if (http.readyState === XMLHttpRequest.DONE && http.status === 200) {
+                    let subCategories = JSON.parse(http.response);
+
+                    let modalBody = document.querySelector('.modal-body');
+                    modalBody.innerHTML = '';
+
+                    let body = '';
+
+                    for (let i = 0; i < subCategories.length; i++) {
+                        let name = subCategories[i].name;
+                        // Correctly concatenate the subcategory id with the string using +
+                        body += "<a onclick=\"openCategories('" +
+                            subCategories[i].id + "')\" class='subcategory-name'>" + name + "</a>";
+                    }
+
+
+
+
+
+                    modalBody.innerHTML = body;
+                }
+            };
+
+            http.send();
+        }
+
+        function openCategories(id) {
+            window.open("/products/get/" + id)
+        }
+
+        function addToFavorite(productId) {
+            const http = new XMLHttpRequest();
+            http.open("POST", "/personal/favourites/" + productId, true);
+            http.setRequestHeader("Content-type", "application/json");
+
+            http.onreadystatechange = function () {
+                if (http.readyState === XMLHttpRequest.DONE && http.status === 200) {
+                    console.log("addded")
+                }
+            };
+
+            http.send();
+        }
+    </script>
+    <style>
+        /** {*/
+        /*    text-align: center;*/
+        /*}*/
+
+        /*assign full width inputs*/
+        input[type=text],
+        input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        /*set a style for the buttons*/
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* set a hover effect for the button*/
+        button:hover {
+            opacity: 0.8;
+        }
+
+        /*set extra style for the cancel button*/
+        .cancelbtn {
+            width: auto;
+            padding: 10px 18px;
+            background-color: #f44336;
+        }
+
+        /*centre the display image inside the container*/
+        .imgcontainer {
+            text-align: center;
+            margin: 24px 0 12px 0;
+            position: relative;
+        }
+
+        /*set image properties*/
+        img.avatar {
+            width: 40%;
+            border-radius: 50%;
+        }
+
+        /*set padding to the container*/
+        .container {
+            padding: 16px;
+        }
+
+        /*set the forgot password text*/
+        span.psw {
+            float: right;
+            padding-top: 16px;
+        }
+
+        /*set the Modal background*/
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        /*style the model content box*/
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto 15% auto;
+            border: 1px solid #888;
+            width: 40%;
+        }
+
+        /*style the close button*/
+        .close {
+            position: absolute;
+            right: 25px;
+            top: 0;
+            color: #000;
+            font-size: 35px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: red;
+            cursor: pointer;
+        }
+
+        /* add zoom animation*/
+        .animate {
+            -webkit-animation: animatezoom 0.6s;
+            animation: animatezoom 0.6s
+        }
+
+        @-webkit-keyframes animatezoom {
+            from {
+                -webkit-transform: scale(0)
+            }
+
+            to {
+                -webkit-transform: scale(1)
+            }
+        }
+
+        @keyframes animatezoom {
+            from {
+                transform: scale(0)
+            }
+
+            to {
+                transform: scale(1)
+            }
+        }
+
+        @media screen and (max-width: 300px) {
+            span.psw {
+                display: block;
+                float: none;
+            }
+
+            .cancelbtn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="container">
+        <div class="header__wrapper">
+            <nav class="header__nav">
+                <ul class="nav__list">
+                    <li class="nav__list__item">
+                        <a th:href="@{/}">
+                            <img style = "width: 80px; border-radius: 50px; " th:src="@{/image/icon/zxc.svg}" alt="logo">
+                        </a>
+                    </li>
+                    <li class="nav__list__item">
+                        <a th:href="@{/info/payment}">Оплата</a>
+                    </li>
+                    <li class="nav__list__item">
+                        <a th:href="@{/info/delivery}">Доставка</a>
+                    </li>
+
+                    <li class="nav__list__item">
+                        <a th:href="@{/info/contacts}">Контакты</a>
+                    </li>
+                </ul>
+            </nav>
+            <p class="contacts">8 777 777 77 77</p>
+        </div>
+    </div>
+
+</header>
+
+<section class="main">
+    <div class="container">
+        <ul class="main__list">
+            <li class="main__list__item">
+                <div class="dropdown">
+                    <button class="catalog">Каталог товаров</button>
+                    <div class="dropdown-content" style="background-color: #fff">
+                        <a th:each="category : ${categories}" class="dropdown-cover" href="#" id="content"
+                           th:id="'category_' + ${category.id}" th:text="${category.getName()}"
+                           th:attr="data-category-id=${category.id}"
+                           onmouseenter="openModal(this.getAttribute('data-category-id'))" />
+                    </div>
+                </div>
+            </li>
+
+            <div class="modal" id="temporaryModal" tabindex="-1" data-bs-backdrop="static" aria-hidden="true" onmouseleave="closeModal()">
+                <div class="modal-dialog">
+                    <div class="modal-content"> <!-- Change modal-lg to adjust size -->
+                        <div class="modal-header">
+                            <h5 class="modal-title"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="modalBody">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <li class="main__list__item">
+                <a href="/handbook">Справочник лекарств</a>
+            </li>
+            <li class="main__list__item">
+                <input onkeyup="onEnter(this)" placeholder="Название товара"  type="text" class="search__input">
+            </li>
+            <li class="main__list__item">
+                <div class="oneLine">
+                    <img th:src="@{/image/icon/authIcon.svg}" alt="">
+                    <p th:if="${user}">Личный кабинет</p>
+                    <button th:unless="${user}" onclick=
+                            "document.getElementById('id01').style.display='block'" style="width:auto;">
+                        Login
+                    </button>
+
+                </div>
+
+                <div id="id01" class="modal">
+
+                    <div class="modal-content animate"
+                    >
+
+                        <div class="imgcontainer">
+                <span onclick="document.getElementById('id01').style.display='none'"
+                      class="close"
+                      title="Close Modal">×</span>
+                            <!--                                <img src=-->
+                            <!--                                             "https://media.geeksforgeeks.org/wp-content/cdn-uploads/20190710102234/download3.png"-->
+                            <!--                                     alt="Avatar" class="avatar">-->
+                        </div>
+
+                        <div class="container">
+                            <label><b>Email</b></label>
+                            <input id="emailInput" type="email" placeholder="Напишите почту"
+                                   name="email" required>
+                            <button onclick="sendSms()" type="submit">Login</button>
+                            <p>Мы вышлем проверочный код на этот email</p>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="main__list__item"> <a href="/personal/favourites">Избранное</a></li>
+            <li class="main__list__item"><a href="/basket">Корзина </a></li>
+        </ul>
+    </div>
+
+</section>
+
+<section class="product">
+    <div class="container">
+        <div class="product__wrapper">
+            <div class="product__left">
+                <img width="200px" th:src="@{/image/1_1_7.jpg}" alt="">
+                <div class="product__info">
+                    <p>Артикул 5533</p>
+                    <p th:text="${product.idRegistrationNumber}">4603679007354</p>
+                </div>
+                <p>Информация о препаратах, отпускаемых по рецепту, предназначена только для специалистов. Приведенная
+                    информация не должна использоваться пациентами для принятия самостоятельного решения о применении
+                    представленных лекарственных препаратов и не может служить заменой очной консультации врача.</p>
+                <p>Представлено описание активных веществ лекарственного препарата. Приведенная научная информация
+                    является обобщающей и не может быть использована для принятия решения о возможности применения
+                    конкретного лекарственного препарата.</p>
+                <div>
+                    <h4>Номер регистрационного удостоверения</h4>
+                    <p th:text="${product.getIdRegistrationNumber()}">РК-ЛС-5№003357</p>
+                </div>
+                <div>
+                    <h4 th:text="${product.getInternationalName()}">Международное непатентованное наименование</h4>
+                    <p>РК-ЛС-5№003357</p>
+                </div>
+                <div>
+                    <h4>Страна производитель</h4>
+                    <p th:text="${product.getCountryProducer()}">РК-ЛС-5№003357</p>
+                </div>
+                <div>
+                    <h4>Срок годности</h4>
+                    <p th:text="${product.getExpirationDate()}">РК-ЛС-5№003357</p>
+                </div>
+                <div>
+                    <h4>Состав</h4>
+                    <p th:text="${product.getStructure()}">Одна капсула содержит активное вещество: раствора ретинола
+                        пальмитата в масле 55% (витамин А) -
+                        0,1 мл (100000 МЕ) вспомогательные вещества: масло кукурузное рафинированное состав капсулы:
+                        желатин, глицерин (глицерол), нипагин, вода очищенная.</p>
+                </div>
+                <div>
+                    <h4 th:text="${product.getDosageForm()}">Показания к применению</h4>
+                    <p>гиповитаминоз и авитаминоз А инфекционные заболевания (корь, дизентерия, трахеит, бронхит,
+                        пневмония) заболевания кожи (ожоги, обморожения, раны, туберкулез кожи, гиперкератозы, ихтиоз,
+                        псориаз, пиодермия, некоторые формы экзем и другие воспалительные и дегенеративные
+                        патологические процессы) заболевания глаз (пигментный ретинит, гемералопия, ксерофтальмия,
+                        кератомаляция, экзематозные поражения век, конъюнктивиты) рахит, гипотрофии острые респираторные
+                        заболевания, хронические бронхолегочные заболевания эрозивно-язвенные и воспалительные поражения
+                        желудочно-кишечного тракта, цирроз печени эпителиальные опухоли и лейкозы (для повышения
+                        устойчивости кроветворной ткани к действию цитостатиков) мастопатия.</p>
+                </div>
+                <div>
+                    <h4>Способ применения и дозы</h4>
+                    <p>Препарат принимают внутрь, после еды, 1 раз в сутки, на ночь. Лечебные дозы при авитаминозах
+                        легкой и средней степени составляют: взрослым — до 33000 МЕ в сутки; при гемералопии,
+                        ксерофтальмии и пигментном ретините — 50000 - 100000 МЕ в сутки При заболеваниях кожи взрослым —
+                        50000 - 100000 МЕ в сутки</p>
+                </div>
+                <div>
+                    <h4>Противопоказания</h4>
+                    <p>повышенная индивидуальная чувствительность желчнокаменная болезнь хронический панкреатит
+                        беременность, период лактации гипервитаминоз А детям до 18 лет С осторожностью: алкоголизм,
+                        цирроз печени, вирусный гепатит, почечная недостаточность, пожилой возраст Особые указания В
+                        отдельных случаях в первый день применения могут возникать зудящие пятнисто-папулезные
+                        высыпания, что требует отмены препарата. С уменьшением дозы или при временной отмене препарата
+                        побочные явления проходят самостоятельно. При назначении высоких доз при болезнях кожи, через
+                        7—10 дней лечения наблюдается обострение местной воспалительной реакции, которое не требует
+                        дополнительного лечения и в дальнейшем уменьшается. Этот эффект связан с миело - и
+                        иммуностимулирующим действием препарата. Особенности влияния лекарственного средства на
+                        способность управлять транспортным средством или потенциально опасными механизмами В период
+                        лечения необходимо соблюдать осторожность при управлении транспортными средствами и занятии
+                        другими потенциально опасными видами деятельности.</p>
+                </div>
+                <div>
+                    <h4>Побочные действия</h4>
+                    <p>Побочные действия</p>
+                </div>
+                <div>
+                    <h4>Лекарственная форма</h4>
+                    <p>РК-ЛС-5№003357</p>
+                </div>
+
+
+            </div>
+            <div class="product__right">
+                <p class="label__product" th:text="${product.getName()}"></p>
+                <p class="label__product">Производитель: <span>АЛТАЙВИТАМИНЫ</span></p>
+                <p class="label__product">РЕТИНОЛ ПАЛЬМИТАТ (ВИТ А) 100000 МЕ №10 капс</p>
+                <p class="label__product">₸200</p>
+                <input class="vCorzinu" th:onclick='toBasket()' type="submit" value="в корзину">
+                <a id="heart" href="#" th:attr="data-category-id=${product.getId}"
+                   onclick="addToFavorite(this.getAttribute('data-category-id'))">
+                    <img id="unlike" th:src="@{/image/icon/heard.svg}" alt="">
+                    <img id="like" class="hide" width="25px" th:src="@{/image/icon/red-heart-icon.svg}" alt="">
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<footer class="footer">
+    <div class="container">
+        <ul class="footer__list">
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Клиентам</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Акции
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Популярный товары
+                    </li>
+
+                    <li class="footer__list__item__list__item">
+                        Личный кабинет
+                    </li>
+                </ul>
+            </li>
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Информация</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Статьи
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Как купить
+                    </li>
+
+                    <li class="footer__list__item__list__item">
+                        О бонусах
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Самовывоз
+                    </li>
+                </ul>
+            </li>
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Компания</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        О нас
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        Контакты
+                    </li>
+
+
+                </ul>
+            </li>
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Мы в соцсетях</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        <a href=""><img style="width: 20px" th:src="@{/image/icon/instagram.svg}" alt="insta"></a>
+                        <a href=""><img style="width: 20px" th:src="@{/image/icon/vk.svg}" alt="vk"></a>
+                        <a href=""><img style="width: 20px" th:src="@{/image/icon/facebook.svg}" alt="facebook"></a>
+                        <a href=""><img style="width: 20px; max-height: 20px;" th:src="@{/image/icon/youtube.svg}" alt="youtube"></a>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="footer__list__item">
+                <ul class="footer__list__item__list">
+                    <li class="footer__list__item__list__item">
+                        <h1>Филиалы</h1>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        <div class="filial">
+                            <div class="filial__left">
+                                <p>ул. Ауэзова 175</p>
+                                <span>9:00-21:00</span>
+                            </div>
+                            <div class="filial__right">
+                                <h1>+7 7078190409</h1>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="footer__list__item__list__item">
+                        <div class="filial">
+                            <div class="filial__left">
+                                <p>ул.Телжан Шонанулы 54а</p>
+                                <span>9:00-21:00</span>
+                            </div>
+                            <div class="filial__right">
+                                <h1>+7 7058472797</h1>
+                            </div>
+                        </div>
+                    </li>
+
+                </ul>
+            </li>
+
+        </ul>
+    </div>
+</footer>
+<script th:inline="javascript">
+    function toBasket() {
+        var productId = /*[[${product.getId()}]]*/ '';
+        addProductToBasket(productId);
+
+    }
+
+    function addProductToBasket(productId) {
+        // URL of the endpoint
+        const url = '/basket';
+
+        // Data to be sent in the request
+        const data = new URLSearchParams();
+        data.append('productId', productId);
+
+        // Fetch options
+        const options = {
+            method: 'POST',
+            body: data,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        };
+
+        // Sending the POST request
+        fetch(url, options)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                // Handle success
+                console.log('Product added to basket successfully');
+            })
+            .catch(error => {
+                // Handle error
+                console.error('There was a problem adding the product to the basket:', error);
+            });
+    }
+
+    // Example usage
+    let unlike = document.getElementById('unlike');
+    let like = document.getElementById('like');
+    like.addEventListener('click', () => {
+        like.classList.add('hide');
+        unlike.classList.remove('hide')
+    });
+
+    unlike.addEventListener('click', () => {
+        unlike.classList.add('hide');
+        like.classList.remove('hide')
+        var productId = /*[[${product.getId()}]]*/ '';
+        addToFavorites(productId);
+    })
+    function addToFavorites(productId) {
+        // URL of the endpoint
+        const url = '/personal/favourites';
+
+        // Data to be sent in the request
+        const data = new URLSearchParams();
+        data.append('productId', productId);
+
+        // Fetch options
+        const options = {
+            method: 'POST',
+            body: data,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        };
+
+        // Sending the POST request
+        fetch(url, options)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                // Handle success
+                console.log('Product added to favorites successfully');
+                // If you need to do something after adding to favorites, you can add it here
+            })
+            .catch(error => {
+                // Handle error
+                console.error('There was a problem adding the product to favorites:', error);
+            });
+    }
+</script>
+
+</body>
+</html>
